@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -33,7 +33,7 @@ public class ShadedBlockSbbBuilder implements VertexConsumer {
 	}
 
 	public void begin() {
-		bufferBuilder = new BufferBuilder(BYTE_BUFFER_BUILDER, VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
+		bufferBuilder = new BufferBuilder(BYTE_BUFFER_BUILDER, PrimitiveTopology.QUADS, DefaultVertexFormat.BLOCK);
 		shadeSwapVertices.clear();
 		currentShade = true;
 	}
@@ -65,7 +65,7 @@ public class ShadedBlockSbbBuilder implements VertexConsumer {
 	}
 
 	protected void prepareForGeometry(BakedQuad quad) {
-		prepareForGeometry(quad.materialInfo().shade());
+		prepareForGeometry(true);
 	}
 
 	@Override
@@ -107,6 +107,11 @@ public class ShadedBlockSbbBuilder implements VertexConsumer {
 
 	@Override
 	public VertexConsumer setUv2(int u, int v) {
+		throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
+	}
+
+	@Override
+	public VertexConsumer setUv3(float u, float v) {
 		throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
 	}
 

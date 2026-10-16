@@ -18,6 +18,7 @@ group = "net.createmod.$modName"
 version = rootProject.version
 
 repositories {
+    mavenLocal() // Local Minecraft 26.3 ports during coordinated development.
     maven("https://maven.createmod.net") // Flywheel
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") // Forge Config API Port
 }

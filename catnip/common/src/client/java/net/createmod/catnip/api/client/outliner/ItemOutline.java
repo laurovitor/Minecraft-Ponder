@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.createmod.catnip.api.client.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollection;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.LightCoordsUtil;
@@ -18,7 +16,6 @@ public class ItemOutline extends Outline {
 	protected ItemStack stack;
 
 	protected ItemStackRenderState renderState = new ItemStackRenderState();
-	protected SubmitNodeStorage queue = new SubmitNodeStorage();
 	//protected PoseStack poseStack;
 
 	public ItemOutline(Vec3 pos, ItemStack stack) {
@@ -36,21 +33,8 @@ public class ItemOutline extends Outline {
 		Minecraft.getInstance()
 			.getItemModelResolver()
 			.updateForTopItem(renderState, stack, ItemDisplayContext.FIXED, null, null, 0);
-		renderState.submit(ms, queue, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+		renderState.submit(ms, buffer.submitNodeCollector(), LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
 
-		for (SubmitNodeCollection collection : queue.getSubmitsPerOrder().values()) {
-			for (SubmitNodeStorage.ItemSubmit itemSubmit : collection.getItemSubmits()) {
-				ms.pushPose();
-				ms.last().set(itemSubmit.pose());
-				// TODO: FIXME
-//				ItemRenderer.renderItem(
-//					itemSubmit.displayContext(), ms, buffer,
-//					itemSubmit.lightCoords(), itemSubmit.overlayCoords(),
-//					itemSubmit.tintLayers(), itemSubmit.quads(), itemSubmit.foilType()
-//				);
-				ms.popPose();
-			}
-		}
 
 		ms.popPose();
 	}

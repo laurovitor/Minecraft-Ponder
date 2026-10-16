@@ -1,92 +1,68 @@
 package net.createmod.catnip.api.client.render;
 
-import java.util.SortedMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SectionBufferBuilderPack;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.util.Util;
 
+/** Bridges Catnip's immediate vertex API to Minecraft 26.3's deferred submit-node renderer. */
 public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
-	private static final DefaultSuperRenderTypeBuffer INSTANCE = new DefaultSuperRenderTypeBuffer();
+	private final SubmitNodeCollector submitNodeCollector;
+	private final Map<RenderType, RecordingVertexConsumer> earlyBuffer = new LinkedHashMap<>();
+	private final Map<RenderType, RecordingVertexConsumer> defaultBuffer = new LinkedHashMap<>();
+	private final Map<RenderType, RecordingVertexConsumer> lateBuffer = new LinkedHashMap<>();
 
-	public static DefaultSuperRenderTypeBuffer getInstance() {
-		return INSTANCE;
-	}
-
-	protected SuperRenderTypeBufferPhase earlyBuffer;
-	protected SuperRenderTypeBufferPhase defaultBuffer;
-	protected SuperRenderTypeBufferPhase lateBuffer;
-
-	public DefaultSuperRenderTypeBuffer() {
-		earlyBuffer = new SuperRenderTypeBufferPhase();
-		defaultBuffer = new SuperRenderTypeBufferPhase();
-		lateBuffer = new SuperRenderTypeBufferPhase();
+	public DefaultSuperRenderTypeBuffer(SubmitNodeCollector submitNodeCollector) {
+		this.submitNodeCollector = submitNodeCollector;
 	}
 
 	@Override
 	public VertexConsumer getEarlyBuffer(RenderType type) {
-		return earlyBuffer.bufferSource.getBuffer(type);
+		return earlyBuffer.computeIfAbsent(type, ignored -> new RecordingVertexConsumer());
 	}
 
 	@Override
 	public VertexConsumer getBuffer(RenderType type) {
-		return defaultBuffer.bufferSource.getBuffer(type);
+		return defaultBuffer.computeIfAbsent(type, ignored -> new RecordingVertexConsumer());
 	}
 
 	@Override
 	public VertexConsumer getLateBuffer(RenderType type) {
-		return lateBuffer.bufferSource.getBuffer(type);
+		return lateBuffer.computeIfAbsent(type, ignored -> new RecordingVertexConsumer());
 	}
 
 	@Override
 	public void draw() {
-		earlyBuffer.bufferSource.endBatch();
-		defaultBuffer.bufferSource.endBatch();
-		lateBuffer.bufferSource.endBatch();
+		submit(earlyBuffer, submitNodeCollector.order(-1));
+		submit(defaultBuffer, submitNodeCollector);
+		submit(lateBuffer, submitNodeCollector.order(1));
 	}
 
 	@Override
 	public void draw(RenderType type) {
-		earlyBuffer.bufferSource.endBatch(type);
-		defaultBuffer.bufferSource.endBatch(type);
-		lateBuffer.bufferSource.endBatch(type);
+		submit(type, earlyBuffer.remove(type), submitNodeCollector.order(-1));
+		submit(type, defaultBuffer.remove(type), submitNodeCollector);
+		submit(type, lateBuffer.remove(type), submitNodeCollector.order(1));
 	}
 
-	public static class SuperRenderTypeBufferPhase {
-		// Visible clones from RenderBuffers
-		private final SectionBufferBuilderPack fixedBufferPack = new SectionBufferBuilderPack();
-		private final SortedMap<RenderType, ByteBufferBuilder> fixedBuffers = Util.make(new Object2ObjectLinkedOpenHashMap<>(), map -> {
-			// map.put(Sheets.solidBlockSheet(), fixedBufferPack.buffer(ChunkSectionLayer.SOLID));
-			map.put(Sheets.cutoutBlockSheet(), fixedBufferPack.buffer(ChunkSectionLayer.CUTOUT));
-			map.put(Sheets.translucentItemSheet(), fixedBufferPack.buffer(ChunkSectionLayer.TRANSLUCENT));
-			put(map, Sheets.translucentBlockItemSheet());
-			// put(map, Sheets.shieldSheet());
-			// put(map, Sheets.bedSheet());
-			// put(map, Sheets.shulkerBoxSheet());
-			// put(map, Sheets.signSheet());
-			// put(map, Sheets.hangingSignSheet());
-			// map.put(Sheets.chestSheet(), new ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE));
-			put(map, RenderTypes.armorEntityGlint());
-			put(map, RenderTypes.glint());
-			put(map, RenderTypes.glintTranslucent());
-			put(map, RenderTypes.entityGlint());
-			put(map, RenderTypes.waterMask());
+	@Override
+	public SubmitNodeCollector submitNodeCollector() {
+		return submitNodeCollector;
+	}
 
-			//extras
-			put(map, PonderRenderTypes.outlineSolid());
-		});
-		private final BufferSource bufferSource = MultiBufferSource.immediateWithBuffers(fixedBuffers, new ByteBufferBuilder(256));
+	private static void submit(Map<RenderType, RecordingVertexConsumer> recordings, OrderedSubmitNodeCollector collector) {
+		recordings.forEach((type, recording) -> submit(type, recording, collector));
+		recordings.clear();
+	}
 
-		private static void put(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> map, RenderType type) {
-			map.put(type, new ByteBufferBuilder(type.bufferSize()));
-		}
+	private static void submit(RenderType type, RecordingVertexConsumer recording, OrderedSubmitNodeCollector collector) {
+		if (recording == null || recording.isEmpty())
+			return;
+		collector.submitCustomGeometry(new PoseStack(), type, (pose, target) -> recording.replay(target));
 	}
 }

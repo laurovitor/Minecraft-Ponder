@@ -12,7 +12,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.createmod.catnip.api.theme.Color;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -272,6 +272,6 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
 
 	private static int getLight(BlockAndTintGetter world, Vector4f lightPos) {
 		BlockPos pos = BlockPos.containing(lightPos.x(), lightPos.y(), lightPos.z());
-		return WORLD_LIGHT_CACHE.computeIfAbsent(pos.asLong(), $ -> LevelRenderer.getLightCoords(world, pos));
+		return WORLD_LIGHT_CACHE.computeIfAbsent(pos.asLong(), $ -> LightCoordsUtil.getLightCoords(world, pos));
 	}
 }

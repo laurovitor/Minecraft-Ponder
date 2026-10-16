@@ -2,12 +2,12 @@ package net.createmod.catnip.api.client.platform;
 
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -21,8 +21,6 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -45,13 +43,12 @@ public interface ModClientHooksHelper {
 	// note: implementations don't use isDown since we need this to work inside screens
 	boolean isKeyPressed(KeyMapping mapping);
 
-	void registerPictureInPictureRenderer(Class<?> stateClass,Function<BufferSource, PictureInPictureRenderer<?>> factory);
+	void registerPictureInPictureRenderer(Class<?> stateClass, Supplier<PictureInPictureRenderer<?>> factory);
 
 	RenderPipeline.Builder useDrawModeInGui(RenderPipeline.Builder builder);
 
 	void submitFullFluidState(PoseStack ms, OrderedSubmitNodeCollector buffer, FluidState fluid);
 
-	void renderFullFluidState(PoseStack ms, MultiBufferSource.BufferSource buffer, FluidState fluid);
 
 	@ApiStatus.Internal
 	void submitModel(BlockStateModel model, BlockPos pos, BlockState state, @Nullable PoseStack poseStack, ShadeSeparatedBufferSource bufferSource, OrderedSubmitNodeCollector submitNodeCollector);

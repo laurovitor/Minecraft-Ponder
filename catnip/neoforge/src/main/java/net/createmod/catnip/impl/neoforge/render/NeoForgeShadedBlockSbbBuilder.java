@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.model.quad.MutableQuad;
 public class NeoForgeShadedBlockSbbBuilder extends ShadedBlockSbbBuilder implements VertexConsumer {
 	@Override
 	public void putMutableQuad(Pose pose, MutableQuad quad, QuadInstance instance) {
-		this.prepareForGeometry(quad.shade());
+		this.prepareForGeometry(quad.hasAmbientOcclusion());
 		this.bufferBuilder.putMutableQuad(pose, quad, instance);
 	}
 }

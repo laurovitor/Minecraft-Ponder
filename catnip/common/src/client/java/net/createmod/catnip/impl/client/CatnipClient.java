@@ -46,7 +46,7 @@ public final class CatnipClient {
 
 		ClientTickCallback.EVENT.pre().subscribe(CatnipClient::beforeClientTick);
 		LevelRendererReloadCallback.EVENT.subscribe(CatnipClient::onRendererReload);
-		LevelRenderCallback.AFTER_TRANSLUCENT_FEATURES.subscribe(CatnipClient::onLevelRender);
+		LevelRenderCallback.COLLECT_SUBMITS.subscribe(CatnipClient::onLevelRender);
 		AtlasStitchedCallback.EVENT.subscribe(StitchedSprite::afterAtlasStitch);
 
 		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiBlockModelRenderState.class, GuiBlockModelRenderer::new);
@@ -75,12 +75,13 @@ public final class CatnipClient {
 		SuperByteBufferCache.getInstance().invalidate();
 	}
 
-	public static void onLevelRender(LevelRenderer renderer, LevelRenderState state, PoseStack transforms) {
-		Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+	public static void onLevelRender(LevelRenderer renderer, LevelRenderState state, PoseStack transforms,
+									 net.minecraft.client.renderer.SubmitNodeCollector collector) {
+		Vec3 cameraPos = Minecraft.getInstance().gameRenderer.mainCamera().position();
 		float partialTicks = AnimationTickHolder.getPartialTicks();
 
 		transforms.pushPose();
-		SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
+		SuperRenderTypeBuffer buffer = new DefaultSuperRenderTypeBuffer(collector);
 
 		GhostBlocks.getInstance().renderAll(transforms, buffer, cameraPos);
 		Outliner.getInstance().renderOutlines(transforms, buffer, cameraPos, partialTicks);

@@ -32,19 +32,19 @@ class UniversalMeshEmitter implements VertexConsumer {
 
 	@Override
 	public void putBakedQuad(Pose pose, BakedQuad quad, QuadInstance instance) {
-		var buffer = bufferSource.getBuffer(quad.materialInfo().layer(), quad.materialInfo().shade());
+		var buffer = bufferSource.getBuffer(quad.materialInfo().layer(), quad.materialInfo().ambientOcclusion());
 		buffer.putBakedQuad(pose, quad, instance);
 	}
 
 	@Override
 	public void putMutableQuad(Pose pose, MutableQuad quad, QuadInstance instance) {
-		var buffer = bufferSource.getBuffer(quad.chunkLayer(), quad.shade());
+		var buffer = bufferSource.getBuffer(quad.chunkLayer(), quad.hasAmbientOcclusion());
 		buffer.putMutableQuad(pose, quad, instance);
 	}
 
 	@Override
 	public void putBlockBakedQuad(float x, float y, float z, BakedQuad quad, QuadInstance instance) {
-		var buffer = bufferSource.getBuffer(quad.materialInfo().layer(), quad.materialInfo().shade());
+		var buffer = bufferSource.getBuffer(quad.materialInfo().layer(), quad.materialInfo().ambientOcclusion());
 		buffer.putBlockBakedQuad(x, y, z, quad, instance);
 	}
 
@@ -82,6 +82,11 @@ class UniversalMeshEmitter implements VertexConsumer {
 	public VertexConsumer setUv2(int i, int i1) {
 		var buffer = bufferSource.getBuffer(defaultLayer, currentShade);
 		return buffer.setUv2(i, i1);
+	}
+
+
+	public VertexConsumer setUv3(float u, float v) {
+		return bufferSource.getBuffer(defaultLayer, currentShade).setUv3(u, v);
 	}
 
 	@Override

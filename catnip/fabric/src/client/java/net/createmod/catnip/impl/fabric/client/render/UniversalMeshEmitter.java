@@ -44,8 +44,8 @@ class UniversalMeshEmitter {//implements BlockMultiBufferSource {
 		return wrapperModel;
 	}
 
-	 private void prepareForGeometry(MutableQuadView quad) {
-	 	currentShade = quad.diffuseShade();
+	private void prepareForGeometry(MutableQuadView quad) {
+		currentShade = true;
 	 }
 
 	 /*@Override

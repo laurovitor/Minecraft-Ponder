@@ -11,7 +11,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -65,22 +64,11 @@ public interface CatnipStreamCodecs {
 		}
 	};
 
-	StreamCodec<FriendlyByteBuf, ListTag> COMPOUND_LIST_TAG = new StreamCodec<>() {
-		@Override
-		public ListTag decode(FriendlyByteBuf buffer) {
-			return buffer.readCollection(size -> new ListTag(), COMPOUND_AS_TAG);
-		}
-
-		@Override
-		public void encode(FriendlyByteBuf buffer, ListTag value) {
-			buffer.writeCollection(value, COMPOUND_AS_TAG);
-		}
-	};
-
 	StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> HOLDER_FLUID = ByteBufCodecs.holderRegistry(Registries.FLUID);
 	StreamCodec<RegistryFriendlyByteBuf, Fluid> FLUID = ByteBufCodecs.registry(Registries.FLUID);
 
 	StreamCodec<ByteBuf, Tag> COMPOUND_AS_TAG = ByteBufCodecs.COMPOUND_TAG.map(Function.identity(), tag -> (CompoundTag) tag);
+	StreamCodec<ByteBuf, ListTag> COMPOUND_LIST_TAG = ByteBufCodecs.collection(size -> new ListTag(), COMPOUND_AS_TAG);
 	StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
 	StreamCodec<ByteBuf, BlockPos> NULLABLE_BLOCK_POS = CatnipStreamCodecBuilders.nullable(BlockPos.STREAM_CODEC);
 	StreamCodec<ByteBuf, Direction.Axis> AXIS = CatnipStreamCodecBuilders.ofEnum(Direction.Axis.class);

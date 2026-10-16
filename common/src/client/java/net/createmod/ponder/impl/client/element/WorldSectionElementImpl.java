@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -34,7 +34,7 @@ import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.api.client.scene.Selection;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.api.client.render.SuperRenderTypeBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -249,16 +249,16 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 			double rotY = Mth.lerp(pt, prevAnimatedRotation.y, animatedRotation.y);
 
 			ms.translate(centerOfRotation);
-			ms.mulPose(Axis.XP.rotationDegrees((float) rotX));
-			ms.mulPose(Axis.YP.rotationDegrees((float) rotY));
-			ms.mulPose(Axis.ZP.rotationDegrees((float) rotZ));
+			ms.rotateDegrees(Axis.XP, (float) rotX);
+			ms.rotateDegrees(Axis.YP, (float) rotY);
+			ms.rotateDegrees(Axis.ZP, (float) rotZ);
 			ms.translate(-centerOfRotation.x, -centerOfRotation.y, -centerOfRotation.z);
 
 			if (stabilizationAnchor != null) {
 				ms.translate(stabilizationAnchor);
-				ms.mulPose(Axis.XP.rotationDegrees((float) -rotX));
-				ms.mulPose(Axis.YP.rotationDegrees((float) -rotY));
-				ms.mulPose(Axis.ZP.rotationDegrees((float) -rotZ));
+				ms.rotateDegrees(Axis.XP, (float) -rotX);
+				ms.rotateDegrees(Axis.YP, (float) -rotY);
+				ms.rotateDegrees(Axis.ZP, (float) -rotZ);
 				ms.translate(-stabilizationAnchor.x, -stabilizationAnchor.y, -stabilizationAnchor.z);
 			}
 		}
@@ -317,7 +317,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 	}
 
 	@Override
-	protected void renderFirst(PonderLevel level, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	protected void renderFirst(PonderLevel level, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 	                           CameraRenderState cameraRenderState, PoseStack poseStack, float fade, float pt) {
 		int light = -1;
 		if (fade != 1)
@@ -355,7 +355,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 			poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
 			BlockState state = level.getBlockState(pos);
 			BlockStateModel model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state);
-			queue.submitBreakingBlockModel(poseStack, model, state.getSeed(pos), progress);
+			java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> parts = new java.util.ArrayList<>();
+			model.collectParts(net.minecraft.util.RandomSource.create(state.getSeed(pos)), parts);
+			queue.submitBreakingBlockModel(poseStack, parts, progress, model.hasMaterialFlag(net.minecraft.client.resources.model.geometry.BakedQuad.FLAG_TRANSLUCENT));
 			poseStack.popPose();
 		}
 
@@ -363,7 +365,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 	}
 
 	@Override
-	protected void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer layer,
+	protected void renderLayer(PonderLevel world, SuperRenderTypeBuffer buffer, ChunkSectionLayer layer,
 							   SubmitNodeCollector queue, Camera camera, CameraRenderState cameraRenderState,
 							   PoseStack poseStack, float fade, float pt) {
 		SuperByteBufferCache bufferCache = SuperByteBufferCache.getInstance();
@@ -388,7 +390,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 	}
 
 	@Override
-	protected void renderLast(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	protected void renderLast(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 							  CameraRenderState cameraRenderState, PoseStack poseStack, float fade, float pt) {
 		redraw = false;
 		if (selectedBlock == null)
@@ -452,7 +454,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 	private SuperByteBuffer buildStructureBuffer(PonderLevel world, ChunkSectionLayer layer) {
 		ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
 		SbbBuilder sbbBuilder = objects.sbbBuilder;
-		sbbBuilder.prepare(layer.pipeline());
+		sbbBuilder.prepare(layer.pipeline(false));
 
 		world.setMask(section);
 		world.pushFakeLight(0);

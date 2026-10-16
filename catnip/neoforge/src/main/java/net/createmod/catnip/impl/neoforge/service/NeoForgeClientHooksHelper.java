@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jspecify.annotations.Nullable;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline.Builder;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline.Builder;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -31,8 +30,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -47,7 +44,7 @@ public class NeoForgeClientHooksHelper implements ModClientHooksHelper {
 	private static final Supplier<Map<Identifier, ParticleProvider<?>>> particleProviders = () -> Minecraft.getInstance().particleEngine.resourceManager.getProviders();
 
 	@Internal
-	public static final Map<Class<?>, Function<BufferSource, PictureInPictureRenderer<?>>> PIP_RENDERERS = new HashMap<>();
+	public static final Map<Class<?>, Supplier<PictureInPictureRenderer<?>>> PIP_RENDERERS = new HashMap<>();
 
 	@Override
 	public Locale getCurrentLocale() {
@@ -73,11 +70,11 @@ public class NeoForgeClientHooksHelper implements ModClientHooksHelper {
 	public boolean isKeyPressed(KeyMapping mapping) {
 		int keyCode = mapping.getKey().getValue();
 		Window window = Minecraft.getInstance().getWindow();
-		return InputConstants.isKeyDown(window, keyCode) && mapping.isConflictContextAndModifierActive();
+		return InputConstants.isKeyDown(keyCode) && mapping.isConflictContextAndModifierActive();
 	}
 
 	@Override
-	public void registerPictureInPictureRenderer(Class<?> stateClass, Function<BufferSource, PictureInPictureRenderer<?>> factory) {
+	public void registerPictureInPictureRenderer(Class<?> stateClass, Supplier<PictureInPictureRenderer<?>> factory) {
 		PIP_RENDERERS.put(stateClass, factory);
 	}
 
@@ -91,11 +88,6 @@ public class NeoForgeClientHooksHelper implements ModClientHooksHelper {
 		FluidRenderHelper.submitFluidBox(fluid, 0, 0, 0, 1, 1, 1, buffer, ms, LightCoordsUtil.FULL_BRIGHT, false, true);
 	}
 
-	@Override
-	public void renderFullFluidState(PoseStack ms, MultiBufferSource.BufferSource buffer, FluidState fluid) {
-		FluidRenderHelper.renderFluidBox(fluid, 0, 0, 0, 1, 1, 1, buffer, ms,
-			LightCoordsUtil.FULL_BRIGHT, false, true);
-	}
 
 	@Override
 	public void submitModel(BlockStateModel model, BlockPos pos, BlockState state, @Nullable PoseStack poseStack, ShadeSeparatedBufferSource bufferSource, OrderedSubmitNodeCollector submitNodeCollector) {

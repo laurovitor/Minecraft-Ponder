@@ -53,8 +53,8 @@ public final class NeoForgeCatnipConfigRegistry implements CatnipConfigRegistry 
 
 		ModConfig.Type type = switch (id.side()) {
 			case CLIENT -> Type.CLIENT;
-			case COMMON -> Type.COMMON;
-			case SERVER -> Type.SERVER;
+			case COMMON -> Type.LOCAL;
+			case SERVER -> Type.SYNCED;
 		};
 
 		container.registerConfig(type, spec);

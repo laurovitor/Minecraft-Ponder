@@ -16,7 +16,7 @@ import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.PonderScene;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.api.client.render.SuperRenderTypeBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -118,7 +118,7 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 	}
 
 	@Override
-	protected void renderLast(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	protected void renderLast(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 	                          CameraRenderState cameraRenderState, PoseStack poseStack, float fade, float pt) {
 		EntityRenderDispatcher dispatcher = Minecraft.getInstance()
 			.getEntityRenderDispatcher();
@@ -134,7 +134,7 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 			Mth.lerp(pt, entity.zo, entity.getZ()));
 
 		float angle = AngleHelper.angleLerp(pt, entity.yRotO, entity.getYRot());
-		poseStack.mulPose(Axis.YP.rotationDegrees(angle));
+		poseStack.rotateDegrees(Axis.YP, angle);
 
 		EntityRenderState state = dispatcher.extractEntity(entity, pt);
 		dispatcher.submit(state, cameraRenderState, 0, 0, 0, poseStack, queue);

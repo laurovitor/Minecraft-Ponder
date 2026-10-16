@@ -2,11 +2,11 @@ package net.createmod.catnip.impl.fabric.client.service;
 
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline.Builder;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline.Builder;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -26,8 +26,6 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -61,12 +59,12 @@ public class FabricClientHooksHelper implements ModClientHooksHelper {
 	public boolean isKeyPressed(KeyMapping mapping) {
 		int keyCode = KeyMappingHelper.getBoundKeyOf(mapping).getValue();
 		Window window = Minecraft.getInstance().getWindow();
-		return InputConstants.isKeyDown(window, keyCode);
+		return InputConstants.isKeyDown(keyCode);
 	}
 
 	@Override
-	public void registerPictureInPictureRenderer(Class<?> stateClass, Function<BufferSource, PictureInPictureRenderer<?>> factory) {
-		PictureInPictureRendererRegistry.register(ctx -> factory.apply(ctx.bufferSource()));
+	public void registerPictureInPictureRenderer(Class<?> stateClass, Supplier<PictureInPictureRenderer<?>> factory) {
+		PictureInPictureRendererRegistry.register(ctx -> factory.get());
 	}
 
 	@Override
@@ -79,10 +77,6 @@ public class FabricClientHooksHelper implements ModClientHooksHelper {
 		FluidRenderHelper.submitFluidBox(fluid, 0, 0, 0, 1, 1, 1, submitNode, ms, LightCoordsUtil.FULL_BRIGHT, false, true);
 	}
 
-	@Override
-	public void renderFullFluidState(PoseStack ms, MultiBufferSource.BufferSource buffer, FluidState fluid) {
-		FluidRenderHelper.renderFluidBox(fluid, 0, 0, 0, 1, 1, 1, buffer, ms, LightCoordsUtil.FULL_BRIGHT, false, true);
-	}
 
 	@Override
 	public void submitModel(BlockStateModel model, BlockPos pos, BlockState state, @Nullable PoseStack poseStack, ShadeSeparatedBufferSource bufferSource, OrderedSubmitNodeCollector submitNodeCollector) {

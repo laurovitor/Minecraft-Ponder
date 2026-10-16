@@ -2,7 +2,7 @@ package net.createmod.ponder.impl.client;
 
 import java.util.function.Consumer;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.createmod.catnip.api.client.platform.ModClientHooksHelper;
 import net.createmod.ponder.api.Ponder;
@@ -11,7 +11,7 @@ import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.network.chat.Component;
 
 public enum PonderKeybinds {
-	PONDER("ponder", GLFW.GLFW_KEY_W);
+	PONDER("ponder", InputConstants.KEY_W);
 
 	public final Category CATEGORY = new Category(Ponder.id("ponder"));
 

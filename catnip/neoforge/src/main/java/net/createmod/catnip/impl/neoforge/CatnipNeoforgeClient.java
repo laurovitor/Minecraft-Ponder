@@ -1,6 +1,7 @@
 package net.createmod.catnip.impl.neoforge;
 
-import java.util.function.Function;
+
+import java.util.function.Supplier;
 
 import net.createmod.catnip.api.Catnip;
 import net.createmod.catnip.api.client.command.ClientCommands;
@@ -11,6 +12,7 @@ import net.createmod.catnip.impl.client.CatnipClient;
 import net.createmod.catnip.impl.neoforge.service.NeoForgeClientHooksHelper;
 import net.createmod.catnip.impl.neoforge.service.NeoForgeRenderPipelineRegistry;
 import net.createmod.catnip.impl.neoforge.service.NeoforgeHudElements;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
 import net.neoforged.api.distmarker.Dist;
@@ -23,7 +25,7 @@ import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 
 @Mod(value = Catnip.ID, dist = Dist.CLIENT)
@@ -45,7 +47,7 @@ public final class CatnipNeoforgeClient {
 	private static void registerPictureInPictureRenderers(RegisterPictureInPictureRenderersEvent event) {
 		NeoForgeClientHooksHelper.PIP_RENDERERS.forEach((state, factory) -> {
 			//noinspection unchecked,rawtypes
-			event.register((Class<PictureInPictureRenderState>) state, (Function) factory);
+			event.register((Class<PictureInPictureRenderState>) state, (Supplier) factory);
 		});
 	}
 
@@ -82,9 +84,9 @@ public final class CatnipNeoforgeClient {
 		}
 
 		@SubscribeEvent
-		public static void onRenderLevel(RenderLevelStageEvent.AfterTranslucentFeatures event) {
-			LevelRenderCallback.AFTER_TRANSLUCENT_FEATURES.invoker().onRender(
-				event.getLevelRenderer(), event.getLevelRenderState(), event.getPoseStack()
+		public static void onCollectSubmits(SubmitCustomGeometryEvent event) {
+			LevelRenderCallback.COLLECT_SUBMITS.invoker().onRender(
+				Minecraft.getInstance().levelRenderer, event.getLevelRenderState(), event.getPoseStack(), event.getSubmitNodeCollector()
 			);
 		}
 

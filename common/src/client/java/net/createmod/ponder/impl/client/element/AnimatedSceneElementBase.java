@@ -10,7 +10,7 @@ import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.ponder.api.client.element.AnimatedSceneElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.api.client.render.SuperRenderTypeBuffer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.util.LightCoordsUtil;
@@ -42,7 +42,7 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
 	}
 
 	@Override
-	public final void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer layer,
+	public final void renderLayer(PonderLevel world, SuperRenderTypeBuffer buffer, ChunkSectionLayer layer,
 								  SubmitNodeCollector queue, Camera camera, CameraRenderState cameraRenderState,
 								  PoseStack poseStack, float pt) {
 		poseStack.pushPose();
@@ -52,7 +52,7 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
 	}
 
 	@Override
-	public final void renderFirst(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue,
+	public final void renderFirst(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue,
 								  Camera camera, CameraRenderState cameraRenderState, PoseStack poseStack, float pt) {
 		poseStack.pushPose();
 		float currentFade = applyFade(poseStack, pt);
@@ -61,7 +61,7 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
 	}
 
 	@Override
-	public final void renderLast(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	public final void renderLast(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 								 CameraRenderState cameraRenderState, PoseStack poseStack, float pt) {
 		poseStack.pushPose();
 		float currentFade = applyFade(poseStack, pt);
@@ -79,16 +79,16 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
 		return currentFade;
 	}
 
-	protected void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer layer,
+	protected void renderLayer(PonderLevel world, SuperRenderTypeBuffer buffer, ChunkSectionLayer layer,
 							   SubmitNodeCollector queue, Camera camera, CameraRenderState cameraRenderState,
 							   PoseStack poseStack, float fade, float pt) {
 	}
 
-	protected void renderFirst(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	protected void renderFirst(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 							   CameraRenderState cameraRenderState, PoseStack poseStack, float fade, float pt) {
 	}
 
-	protected void renderLast(PonderLevel world, MultiBufferSource buffer, SubmitNodeCollector queue, Camera camera,
+	protected void renderLast(PonderLevel world, SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, Camera camera,
 							  CameraRenderState cameraRenderState, PoseStack poseStack, float fade, float pt) {
 	}
 

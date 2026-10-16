@@ -20,8 +20,8 @@ public final class CatnipFabricClient implements ClientModInitializer {
 		ClientTickEvents.START_CLIENT_TICK.register(_ -> ClientTickCallback.EVENT.pre().invoker().onTick());
 		ClientTickEvents.END_CLIENT_TICK.register(_ -> ClientTickCallback.EVENT.post().invoker().onTick());
 		InvalidateRenderStateCallback.EVENT.register(LevelRendererReloadCallback.EVENT.invoker()::onReload);
-		LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(context -> LevelRenderCallback.AFTER_TRANSLUCENT_FEATURES.invoker().onRender(
-			context.levelRenderer(), context.levelState(), context.poseStack()
+		LevelRenderEvents.COLLECT_SUBMITS.register(context -> LevelRenderCallback.COLLECT_SUBMITS.invoker().onRender(
+			context.levelRenderer(), context.levelState(), context.poseStack(), context.submitNodeCollector()
 		));
 		ClientCommandRegistrationCallback.EVENT.register(ClientCommands::registerCommands);
 	}

@@ -50,7 +50,7 @@ import net.createmod.ponder.impl.client.registration.PonderLocalization;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
@@ -261,7 +261,7 @@ public class PonderScene {
 		activeSchedule.add(new HideAllInstruction(10, null));
 	}
 
-	public void renderScene(SuperRenderTypeBuffer buffer, SubmitNodeStorage queue, PoseStack poseStack, float pt) {
+	public void renderScene(SuperRenderTypeBuffer buffer, SubmitNodeCollector queue, PoseStack poseStack, float pt) {
 		Minecraft mc = Minecraft.getInstance();
 
 		poseStack.pushPose();
@@ -577,13 +577,13 @@ public class PonderScene {
 		public PoseStack apply(PoseStack ms, float pt) {
 			ms.translate(width / 2, height / 2, 200 + offset);
 
-			ms.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-35));
-			ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(55));
+			ms.rotateDegrees(com.mojang.math.Axis.XP, -35);
+			ms.rotateDegrees(com.mojang.math.Axis.YP, 55);
 			ms.translate(offset, 0, 0);
-			ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-55));
-			ms.mulPose(com.mojang.math.Axis.XP.rotationDegrees(35));
-			ms.mulPose(com.mojang.math.Axis.XP.rotationDegrees(xRotation.getValue(pt)));
-			ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRotation.getValue(pt)));
+			ms.rotateDegrees(com.mojang.math.Axis.YP, -55);
+			ms.rotateDegrees(com.mojang.math.Axis.XP, 35);
+			ms.rotateDegrees(com.mojang.math.Axis.XP, xRotation.getValue(pt));
+			ms.rotateDegrees(com.mojang.math.Axis.YP, yRotation.getValue(pt));
 
 			UIRenderHelper.flipForGuiRender(ms);
 			float f = 30 * scaleFactor * guiScale;

@@ -2,11 +2,11 @@ package net.createmod.catnip.api.client.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
-public interface SuperRenderTypeBuffer extends MultiBufferSource {
+public interface SuperRenderTypeBuffer {
 	VertexConsumer getEarlyBuffer(RenderType type);
 
 	VertexConsumer getBuffer(RenderType type);
@@ -28,4 +28,6 @@ public interface SuperRenderTypeBuffer extends MultiBufferSource {
 	void draw();
 
 	void draw(RenderType type);
+
+	SubmitNodeCollector submitNodeCollector();
 }
