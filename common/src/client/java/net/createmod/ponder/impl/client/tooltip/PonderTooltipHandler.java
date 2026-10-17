@@ -152,6 +152,14 @@ public final class PonderTooltipHandler {
 		return Items.AIR;
 	}
 
+	public static boolean shouldConsumeTypedCharacter() {
+		Item hoveredItem = determineHoveredItem();
+		return PonderKeybinds.PONDER.isDown()
+			&& hoveredItem != Items.AIR
+			&& !isCurrentPonderSubject(hoveredItem)
+			&& hasPonderScenes(hoveredItem);
+	}
+
 	private static void insert(List<Component> tooltip, Component line) {
 		if (tooltip.size() < 2) {
 			tooltip.add(line);
