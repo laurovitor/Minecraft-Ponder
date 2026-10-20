@@ -30,9 +30,12 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
@@ -150,6 +153,9 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
 		StructureTemplate t = new StructureTemplate();
 		DataInputStream stream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(resourceStream)));
 		CompoundTag nbt = NbtIo.read(stream, NbtAccounter.create(0x20000000L));
+		// Ponder schematics are stored in older data versions; 26.3 renamed palette keys (Name -> id),
+		// so without the structure datafixer every palette entry silently resolves to air.
+		nbt = DataFixTypes.STRUCTURE.updateToCurrentVersion(DataFixers.getDataFixer(), nbt, NbtUtils.getDataVersion(nbt, 500));
 		t.load(BuiltInRegistries.BLOCK, nbt);
 		return t;
 	}
