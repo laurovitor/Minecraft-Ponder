@@ -10,13 +10,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
-	@Inject(
-		method = "allChanged",
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/renderer/ViewArea;repositionCamera(Lnet/minecraft/core/SectionPos;)V"
-		)
-	)
+	@Inject(method = "invalidateCompiledGeometry", at = @At("RETURN"))
 	private void onReload(CallbackInfo ci) {
 		LevelRendererReloadCallback.EVENT.invoker().onReload();
 	}

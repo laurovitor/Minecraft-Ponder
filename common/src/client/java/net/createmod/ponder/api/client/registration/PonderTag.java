@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 public class PonderTag implements ScreenElement {
 	/**
@@ -24,12 +25,14 @@ public class PonderTag implements ScreenElement {
 	private final Identifier id;
 	@Nullable
 	private final Identifier textureIconLocation;
-	private final ItemStack itemIcon;
-	private final ItemStack mainItem;
+	@Nullable
+	private final ItemLike itemIcon;
+	@Nullable
+	private final ItemLike mainItem;
 
 
-	public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, ItemStack itemIcon,
-					 ItemStack mainItem) {
+	public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, @Nullable ItemLike itemIcon,
+					 @Nullable ItemLike mainItem) {
 		this.id = id;
 		this.textureIconLocation = textureIconLocation;
 		this.itemIcon = itemIcon;
@@ -41,7 +44,7 @@ public class PonderTag implements ScreenElement {
 	}
 
 	public ItemStack getMainItem() {
-		return mainItem;
+		return mainItem == null ? ItemStack.EMPTY : new ItemStack(mainItem);
 	}
 
 	public String getTitle() {
@@ -59,8 +62,8 @@ public class PonderTag implements ScreenElement {
 		if (textureIconLocation != null) {
 			poseStack.scale(0.25f, 0.25f);
 			graphics.blit(RenderPipelines.GUI_TEXTURED, textureIconLocation, 0, 0, 0, 0, 0, 64, 64, 64, 64);
-		} else if (!itemIcon.isEmpty()) {
-			GuiGameElement.of(itemIcon)
+		} else if (itemIcon != null) {
+			GuiGameElement.of(new ItemStack(itemIcon))
 				.scale(1.25f)
 				.at(-2, -2)
 				.submit(graphics);

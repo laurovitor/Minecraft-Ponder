@@ -6,7 +6,6 @@
   "client": [
     "BufferBuilderAccessor",
     "ClientPacketListenerAccessor",
-    "LightingAccessor",
     "ParticleEngineAccessor",
     "RenderTypeAccessor",
     "ScreenAccessor",
@@ -20,7 +19,7 @@
   },
   "mixins": [
     "GuiGraphicsExtractorAccessor",
-    "MinecraftMixin",
+    "GuiMixin",
     "ScreenMixin"
   ]
 }

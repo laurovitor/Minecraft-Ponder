@@ -38,7 +38,14 @@ public class NeoForgeClientNetworkHelper implements ClientNetworkHelper {
 				return;
 
 			e.register(type, ((payload, context) -> {
-				((ClientboundPayloadHandler) handler).handle(payload, (LocalPlayer) context.player());
+				LocalPlayer player;
+				try {
+					player = (LocalPlayer) context.player();
+				} catch (UnsupportedOperationException ignored) {
+					// A queued play payload can reach the client after disconnect enters configuration.
+					return;
+				}
+				((ClientboundPayloadHandler) handler).handle(payload, player);
 			}));
 		});
 	}
