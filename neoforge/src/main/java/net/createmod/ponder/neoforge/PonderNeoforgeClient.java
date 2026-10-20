@@ -19,6 +19,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 public class PonderNeoforgeClient {
 	public PonderNeoforgeClient(IEventBus modEventBus) {
 		PonderClient.registerConfig();
+		PonderClient.registerPictureInPictureRenderers();
 		modEventBus.addListener(PonderNeoforgeClient::init);
 	}
 

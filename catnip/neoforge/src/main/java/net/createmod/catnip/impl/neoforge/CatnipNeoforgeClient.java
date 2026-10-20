@@ -32,6 +32,7 @@ import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 public final class CatnipNeoforgeClient {
 	public CatnipNeoforgeClient(IEventBus bus) {
 		CatnipClient.preInit();
+		CatnipClient.registerPictureInPictureRenderers();
 		bus.addListener(CatnipNeoforgeClient::setup);
 		bus.addListener(CatnipNeoforgeClient::loadCompleted);
 		bus.addListener(CatnipNeoforgeClient::afterAtlasStitch);

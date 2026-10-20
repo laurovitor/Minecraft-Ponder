@@ -38,6 +38,16 @@ public final class CatnipClient {
 		CatnipRenderPipelines.init();
 	}
 
+	/**
+	 * Must run before the GUI renderer is built. On NeoForge that happens in the mod constructor,
+	 * since RegisterPictureInPictureRenderersEvent fires before FMLClientSetupEvent.
+	 */
+	public static void registerPictureInPictureRenderers() {
+		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiBlockModelRenderState.class, GuiBlockModelRenderer::new);
+		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiBlockEntityRenderState.class, GuiBlockEntityRenderer::new);
+		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiFluidStateRenderState.class, GuiFluidStateRenderer::new);
+	}
+
 	public static void init() {
 		SuperByteBufferCache.getInstance().registerCompartment(CachedBuffers.GENERIC_BLOCK);
 		SuperByteBufferCache.getInstance().registerCompartment(CachedBuffers.BLOCK_STATE_MODEL);
@@ -48,10 +58,6 @@ public final class CatnipClient {
 		LevelRendererReloadCallback.EVENT.subscribe(CatnipClient::onRendererReload);
 		LevelRenderCallback.COLLECT_SUBMITS.subscribe(CatnipClient::onLevelRender);
 		AtlasStitchedCallback.EVENT.subscribe(StitchedSprite::afterAtlasStitch);
-
-		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiBlockModelRenderState.class, GuiBlockModelRenderer::new);
-		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiBlockEntityRenderState.class, GuiBlockEntityRenderer::new);
-		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(GuiFluidStateRenderState.class, GuiFluidStateRenderer::new);
 
 		ReloadListenerRegistries.INSTANCE.assets().register(CatnipReloadListener.ID, CatnipReloadListener.INSTANCE);
 		HudElements.INSTANCE.register(Catnip.id("placement_helper"), PlacementClient::renderCrosshairOverlay);

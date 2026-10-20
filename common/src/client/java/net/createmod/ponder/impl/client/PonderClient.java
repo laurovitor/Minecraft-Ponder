@@ -17,11 +17,14 @@ public class PonderClient {
 		PonderClientConfig.register();
 	}
 
+	/** Register before the GUI renderer is built; on NeoForge this must not wait for FMLClientSetupEvent. */
+	public static void registerPictureInPictureRenderers() {
+		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(PonderSceneRenderState.class, PonderSceneRenderer::new);
+	}
+
 	public static void init() {
 		SuperByteBufferCache.getInstance().registerCompartment(WorldSectionElementImpl.PONDER_WORLD_SECTION);
 		PonderClientPayloadHandlers.register();
-
-		ModClientHooksHelper.INSTANCE.registerPictureInPictureRenderer(PonderSceneRenderState.class, PonderSceneRenderer::new);
 
 		PonderTooltipHandler.init();
 

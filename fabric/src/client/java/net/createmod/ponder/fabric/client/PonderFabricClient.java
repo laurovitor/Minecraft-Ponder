@@ -13,6 +13,7 @@ public class PonderFabricClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		PonderClient.registerConfig();
+		PonderClient.registerPictureInPictureRenderers();
 		PonderClient.init();
 
 		ItemTooltipCallback.EVENT.register(TooltipQueryCallback.EVENT.invoker()::onTooltipQuery);
