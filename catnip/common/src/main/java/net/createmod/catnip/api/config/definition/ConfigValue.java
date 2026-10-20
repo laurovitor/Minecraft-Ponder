@@ -11,7 +11,8 @@ import java.util.Optional;
 
 /// A value of a [CatnipConfig].
 ///
-/// Attempting to query or set a value before [loading][CatnipConfig#onLoad()] will throw an exception.
+/// Before a config file is loaded, the value holds its declared default. Loading or reloading
+/// replaces it with the configured value and notifies change listeners when it differs.
 public final class ConfigValue<T> implements ConfigElement {
 	public final T defaultValue;
 	public final ConfigPath path;
@@ -20,8 +21,7 @@ public final class ConfigValue<T> implements ConfigElement {
 	private final String comment;
 	private final List<ChangeCallback<T>> changeCallbacks;
 
-	// null before first load
-	private @Nullable T value;
+	private T value;
 
 	public ConfigValue(ConfigPath path, String comment, T defaultValue, @Nullable Validator<T> validator) {
 		if (defaultValue == null) {
@@ -30,6 +30,7 @@ public final class ConfigValue<T> implements ConfigElement {
 
 
 		this.defaultValue = defaultValue;
+		this.value = defaultValue;
 		this.path = path;
 		this.validator = validator;
 		this.comment = comment;
@@ -38,7 +39,6 @@ public final class ConfigValue<T> implements ConfigElement {
 
 	/// @return the current value
 	public T get() {
-		this.assertInitialized();
 		return this.value;
 	}
 
@@ -66,7 +66,6 @@ public final class ConfigValue<T> implements ConfigElement {
 	/// Attempt to set the current value. May fail if the given value is invalid.
 	/// @return an error message if invalid, otherwise empty
 	public Optional<String> trySet(T value) {
-		this.assertInitialized();
 		Optional<String> message = this.validate(value);
 		if (message.isPresent())
 			return message;
@@ -108,12 +107,6 @@ public final class ConfigValue<T> implements ConfigElement {
 	@Override
 	public int hashCode() {
 		return this.path.hashCode();
-	}
-
-	private void assertInitialized() {
-		if (this.value == null) {
-			throw new IllegalStateException("Config value '" + this + "' accessed too early, not loaded yet");
-		}
 	}
 
 	@FunctionalInterface
