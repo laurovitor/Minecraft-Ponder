@@ -121,7 +121,7 @@ public class PonderLevel extends SchematicLevel implements BlockAndTintGetter {
 				TagValueOutput output = TagValueOutput.createWithContext(reporter, registryAccess());
 				e.save(output);
 				ValueInput input = TagValueInput.create(reporter, registryAccess(), output.buildResult());
-				EntityType.create(input, this, new EntitySpawnRequest(EntitySpawnReason.LOAD, false)).ifPresent(originalEntities::add);
+				EntityType.create(input, this, new EntitySpawnRequest(EntitySpawnReason.LOAD, false)).ifPresent(this::addFreshEntity);
 			}
 		});
 		particles.clearEffects();

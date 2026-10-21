@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
@@ -52,6 +53,8 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
 	protected Map<BlockPos, BlockEntity> blockEntities;
 	protected List<BlockEntity> renderedBlockEntities;
 	protected List<Entity> entities;
+	private static final AtomicInteger NEXT_VIRTUAL_ENTITY_ID = new AtomicInteger(-1);
+
 	protected BoundingBox bounds;
 
 	public BlockPos anchor;
@@ -86,6 +89,9 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
 				armorStand.setItemSlot(equipmentSlot,
 					ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getItemBySlot(equipmentSlot)));
 
+		// 26.3 entities have no ID until a level assigns one, and renderers read it while extracting state.
+		// Use negative IDs so virtual entities never collide with entities of the real client level.
+		entityIn.setId(NEXT_VIRTUAL_ENTITY_ID.getAndDecrement());
 		return entities.add(entityIn);
 	}
 
