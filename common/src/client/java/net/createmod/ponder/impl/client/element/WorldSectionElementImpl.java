@@ -436,10 +436,9 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 			ms.pushPose();
 			ms.translate(pos.getX(), pos.getY(), pos.getZ());
 
-			BlockEntityRenderState state = renderer.createRenderState();
-			renderer.extractRenderState(blockEntity, state, pt, camera.position(), null);
-
 			try {
+				BlockEntityRenderState state = renderer.createRenderState();
+				renderer.extractRenderState(blockEntity, state, pt, camera.position(), null);
 				renderer.submit(state, poseStack, queue, cameraRenderState);
 			} catch (Exception e) {
 				iterator.remove();

@@ -3,6 +3,7 @@ package net.createmod.ponder.impl.client.instruction;
 import java.util.function.UnaryOperator;
 
 import net.createmod.ponder.api.Ponder;
+import net.createmod.ponder.api.client.VirtualBlockEntity;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.api.client.scene.Selection;
@@ -36,12 +37,12 @@ public class BlockEntityDataInstruction extends WorldModifyInstruction {
 			if (!type.isInstance(blockEntity))
 				return;
 			CompoundTag apply = data.apply(blockEntity.saveWithFullMetadata(level.registryAccess()));
-			//if (blockEntity instanceof SyncedBlockEntity) //TODO
-			//	((SyncedBlockEntity) blockEntity).readClient(apply);
 			try (ProblemReporter.ScopedCollector problems = new ProblemReporter.ScopedCollector(this::toString, Ponder.LOGGER)) {
 				ValueInput in = TagValueInput.create(problems, level.registryAccess(), apply);
 				blockEntity.loadWithComponents(in);
 			}
+			if (blockEntity instanceof VirtualBlockEntity virtualBlockEntity)
+				virtualBlockEntity.readPonderClientData(apply, level.registryAccess());
 		});
 	}
 

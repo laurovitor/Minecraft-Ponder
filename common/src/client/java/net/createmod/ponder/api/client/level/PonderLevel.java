@@ -112,6 +112,8 @@ public class PonderLevel extends SchematicLevel implements BlockAndTintGetter {
 		blocks.putAll(originalBlocks);
 		originalBlockEntities.forEach((k, v) -> {
 			BlockEntity blockEntity = BlockEntity.loadStatic(k, originalBlocks.get(k), v, registryAccess());
+			if (blockEntity == null)
+				return;
 			onBEAdded(blockEntity, blockEntity.getBlockPos());
 			blockEntities.put(k, blockEntity);
 			renderedBlockEntities.add(blockEntity);
