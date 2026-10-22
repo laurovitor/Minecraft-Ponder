@@ -2,6 +2,7 @@ package net.createmod.ponder.api.client.element;
 
 import com.mojang.blaze3d.platform.Window;
 
+import net.createmod.catnip.api.level.wrapper.SchematicLevel;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.ponder.api.Ponder;
 import net.createmod.ponder.api.client.level.PonderLevel;
@@ -27,7 +28,8 @@ public abstract class ParrotPose {
 	public abstract void tick(PonderScene scene, Parrot entity, Vec3 location);
 
 	public Parrot create(PonderLevel world) {
-		Parrot entity = new Parrot(EntityTypes.PARROT, world);
+		// Never added to the level, so it needs an explicit virtual ID before it can be rendered.
+		Parrot entity = SchematicLevel.assignVirtualEntityId(new Parrot(EntityTypes.PARROT, world));
 		int nextInt = Ponder.RANDOM.nextInt(VARIANTS.length);
 		((ParrotAccessor) entity).ponder$setVariant(VARIANTS[nextInt]);
 		return entity;

@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import net.createmod.catnip.api.animation.LerpedFloat;
+import net.createmod.catnip.api.level.wrapper.SchematicLevel;
 import net.createmod.ponder.api.client.element.MinecartElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.PonderScene;
@@ -54,7 +55,7 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
 	public void tick(PonderScene scene) {
 		super.tick(scene);
 		if (entity == null)
-			entity = constructor.create(scene.getWorld(), 0, 0, 0);
+			entity = SchematicLevel.assignVirtualEntityId(constructor.create(scene.getWorld(), 0, 0, 0));
 
 		entity.tickCount++;
 		entity.setOnGround(true);
@@ -104,7 +105,7 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
 		EntityRenderDispatcher dispatcher = Minecraft.getInstance()
 			.getEntityRenderDispatcher();
 		if (entity == null)
-			entity = constructor.create(world, 0, 0, 0);
+			entity = SchematicLevel.assignVirtualEntityId(constructor.create(world, 0, 0, 0));
 
 		poseStack.pushPose();
 		poseStack.translate(location.x, location.y, location.z);

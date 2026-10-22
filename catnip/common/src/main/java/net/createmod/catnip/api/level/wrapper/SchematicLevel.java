@@ -89,10 +89,17 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
 				armorStand.setItemSlot(equipmentSlot,
 					ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getItemBySlot(equipmentSlot)));
 
-		// 26.3 entities have no ID until a level assigns one, and renderers read it while extracting state.
-		// Use negative IDs so virtual entities never collide with entities of the real client level.
-		entityIn.setId(NEXT_VIRTUAL_ENTITY_ID.getAndDecrement());
-		return entities.add(entityIn);
+		return entities.add(assignVirtualEntityId(entityIn));
+	}
+
+	/**
+	 * 26.3 entities have no ID until a level assigns one, and renderers read it while extracting state.
+	 * Virtual entities (scene entities, or entities rendered directly by Ponder elements without ever being
+	 * added to a level) get negative IDs so they never collide with entities of the real client level.
+	 */
+	public static <T extends Entity> T assignVirtualEntityId(T entity) {
+		entity.setId(NEXT_VIRTUAL_ENTITY_ID.getAndDecrement());
+		return entity;
 	}
 
 	@Override
